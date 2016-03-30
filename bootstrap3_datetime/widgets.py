@@ -90,14 +90,22 @@ class DateTimePicker(DateTimeInput):
     js_template = '''
         <script>
             (function(window) {
-                var callback = function() {
-                    $(function(){$("#%(picker_id)s:has(input:not([readonly],[disabled]))").datetimepicker(%(options)s);});
-                };
-                if(window.addEventListener)
-                    window.addEventListener("load", callback, false);
-                else if (window.attachEvent)
-                    window.attachEvent("onload", callback);
-                else window.onload = callback;
+                function initialize() {
+                    $($("#%(picker_id)s:has(input:not([readonly],[disabled]))").datetimepicker(%(options)s));
+                }
+                if (window.jQuery) {  
+                    initialize();
+                } else {
+                    // no jQuery yet, lets try again when page fully loads
+                    var callback = function() { initialize(); };
+                    if(window.addEventListener) {
+                        window.addEventListener("load", callback, false);
+                    } else if (window.attachEvent) {
+                        window.attachEvent("onload", callback);
+                    } else {
+                        window.onload = callback;
+                    }
+                }
             })(window);
         </script>'''
 
